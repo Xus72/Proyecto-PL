@@ -1,0 +1,58 @@
+programa: variables subprogramas instrucciones
+
+variables: VARIABLES (decl_vars)*
+
+decl_vars : vars DP tipo
+
+tipo: NUM | LOG | SEQ PA tipo PC
+
+vars: IDENT (COMA vars)?
+
+subprogramas: SUBPROGRAMA (subprograma)*
+
+subprograma: funcion | procedimiento
+
+funcion: FUNCION nombre_funcion PA (tipo variable)* PC DEV PA (tipo variable)* PC variables instrucciones
+
+nombre_funcion: IDENT
+
+variable: IDENT
+
+procedimiento: PROCEDIMIENTO nombre_procedimiento PA PC
+    | PROCEDIMIENTO nombre_procedimiento PA (tipo variable)* PC variables instrucciones
+
+instrucciones: INSTRUCCIONES (instruccion)*
+
+instruccion: asignacion | condicional | iteracion | ruptura | llamada_funcion | llamada_procedimiento | devolucion | mostrar | aserto
+
+asignacion : variable ASIG expr PyC
+
+condicional: condicion bloque
+
+condicion: SI PA expr PC ENTONCES bloque FSI
+    | SI PA expr PC ENTONCES bloque SINO bloque FSI
+
+bloque: variable ASIG expr
+
+iteracion: (asignacion)* MIENTRAS condicional iteracion FMIENTRAS
+
+\\falta ruptura, llamada_funcion, llamada_procedimiento, etc
+
+mostrar: MOSTRAR PA variable PC
+
+expr: expr_numerica
+    | expr_booleana
+    | expr_secuencia
+
+expr_numerica: NUM
+    | expr (MAS | MENOS | MULTI) expr
+    | variable
+
+expr_booleana: expr (MAYOR | MAYORIGUAL | MENOR | MENORIGUAL | IGUAL) expr
+
+expr_secuencia: secuencia_vacia
+    | seq_elems
+
+secuencia_vacia: CA CC
+
+seq_elems: (expr_numerica | expr_booleana | expr_secuencia) (COMA seq_elems)*
