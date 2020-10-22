@@ -26,6 +26,8 @@ instrucciones: INSTRUCCIONES (instruccion)*
 instruccion: asignacion | condicional | iteracion | ruptura | llamada_funcion | llamada_procedimiento | devolucion | mostrar | aserto
 
 asignacion : variable ASIG expr PyC
+    | vars ASIG llamada_funcion PyC
+    | vars ASIG llamada_procedimiento PyC
 
 condicional: condicion bloque
 
@@ -36,23 +38,34 @@ bloque: variable ASIG expr
 
 iteracion: (asignacion)* MIENTRAS condicional iteracion FMIENTRAS
 
-\\falta ruptura, llamada_funcion, llamada_procedimiento, etc
+llamada_funcion: NOMBRE_FUNCION PA expr PC
+
+llamada_procedimiento: NOMBRE_PROCEDIMIENTO PA expr PC
+\\falta ruptura, aserto
 
 mostrar: MOSTRAR PA variable PC
+
+aserto: LLA cuantificador LLC
+
+ruptura: RUPTURA PyC
 
 expr: expr_numerica
     | expr_booleana
     | expr_secuencia
+    | variable
 
-expr_numerica: NUM
+expr_numerica: NUMERO
     | expr (MAS | MENOS | MULTI) expr
     | variable
 
 expr_booleana: expr (MAYOR | MAYORIGUAL | MENOR | MENORIGUAL | IGUAL) expr
 
 expr_secuencia: secuencia_vacia
-    | seq_elems
+    | PA seq_elems PC
 
 secuencia_vacia: CA CC
 
 seq_elems: (expr_numerica | expr_booleana | expr_secuencia) (COMA seq_elems)*
+
+cuantificacion: PARATODO variable DP expr
+    | EXISTE variable DP expr
