@@ -41,7 +41,6 @@ iteracion: (asignacion)* MIENTRAS condicional iteracion FMIENTRAS
 llamada_funcion: NOMBRE_FUNCION PA expr PC
 
 llamada_procedimiento: NOMBRE_PROCEDIMIENTO PA expr PC
-\\falta ruptura, aserto
 
 mostrar: MOSTRAR PA variable PC
 
@@ -59,6 +58,10 @@ expr_numerica: NUMERO
     | variable
 
 expr_booleana: expr (MAYOR | MAYORIGUAL | MENOR | MENORIGUAL | IGUAL) expr
+    | expr Y expr
+    | expr O expr
+    | CIERTO
+    | FALSO
 
 expr_secuencia: secuencia_vacia
     | PA seq_elems PC
