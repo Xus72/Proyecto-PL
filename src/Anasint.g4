@@ -37,7 +37,6 @@ instruccion: asignacion | condicional | iteracion | ruptura | llamada_funcion | 
 
 asignacion: vars ASIG expr PyC
     | vars ASIG llamada_funcion PyC
-    | vars ASIG llamada_procedimiento PyC
     ;
 
 condicional: SI PA condicion PC ENTONCES (bloque)* (alternativa)? FSI instruccion?

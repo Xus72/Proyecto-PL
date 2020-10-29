@@ -1,0 +1,18 @@
+VARIABLES
+    i,max,min:NUM;
+    s:SEQ(NUM);
+SUBPROGRAMAS
+    FUNCION bucle_1_avance(SEQ(NUM) seq, NUM pos) dev (NUM r)
+    VARIABLES
+    INSTRUCCIONES
+        r=ultima_posicion(s)-i;
+        dev r;
+    FFUNCION
+INSTRUCCIONES
+    s = [3,4,2,7,9,0,11];
+    x = 1;
+    y = 2;
+    x,y = y,x+2;
+    x = 1;
+    y = 2;
+    y = y,x+2;
