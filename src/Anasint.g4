@@ -21,11 +21,11 @@ subprogramas: SUBPROGRAMAS (subprograma)*;
 
 subprograma: funcion | procedimiento;
 
-funcion: FUNCION IDENT PA param PC DEV PA param PC variables instrucciones FFUNCION;
+funcion: FUNCION IDENT PA PC DEV PA param variables instrucciones FFUNCION
+    | FUNCION IDENT PA param PC DEV PA param PC variables instrucciones FFUNCION;
 
-procedimiento: PROCEDIMIENTO IDENT PA PC FPROCEDIMIENTO
-    | PROCEDIMIENTO IDENT PA param PC variables instrucciones FPROCEDIMIENTO
-    ;
+procedimiento: PROCEDIMIENTO IDENT PA PC variables instrucciones FPROCEDIMIENTO
+    | PROCEDIMIENTO IDENT PA param PC variables instrucciones FPROCEDIMIENTO;
 
 param: tipo variable
     | tipo variable (COMA tipo variable)*
@@ -56,20 +56,20 @@ bloque: instruccion
 iteracion: MIENTRAS PA condicion PC HACER bloque FMIENTRAS;
 
 llamada_funcion: IDENT PA expr PC
-    | IDENT DP IDENT PA (vars)
+    | avance
     ;
 
 llamada_procedimiento: IDENT PA expr PC;
 
 mostrar: MOSTRAR PA variable PC;
 
+avance: IDENT DP IDENT PA (vars) PC
+
 aserto: LLA cuantificador LLC;
 
 ruptura: RUPTURA PyC;
 
-dev: DEV vars PyC
-    | DEV expr PyC
-    ;
+dev: DEV vars PyC;
 
 expr: expr_num | expr_bool | expr_sec | vars;
 

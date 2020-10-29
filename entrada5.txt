@@ -1,0 +1,26 @@
+VARIABLES
+    i,max,min:NUM;
+    s:SEQ(NUM);
+SUBPROGRAMAS
+    FUNCION mayor(SEQ s) dev (NUM i,NUM max)
+    VARIABLES
+        i: NUM;
+    INSTRUCCIONES
+        i=0;
+        max=s[i];
+        mientras(i<=ultima_posicion(s)) hacer {avance: bucle_1_avance(s, i)}
+        si(s[i]>max) entonces
+            max=s[i];
+        fsi
+        i=i+1;
+        fmientras
+        dev max,i;
+    FFUNCION
+INSTRUCCIONES
+    s = [3,4,2,7,9,0,11];
+    x = 1;
+    y = 2;
+    x,y = y,x+2;
+    x = 1;
+    y = 2;
+    y = y,x+2;
