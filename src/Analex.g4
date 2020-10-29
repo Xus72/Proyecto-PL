@@ -1,0 +1,57 @@
+//Analizador léxico Lenguaje P
+lexer grammar Analex;
+
+BLANCO: ' ' ->skip;
+TABULADOR: '\t'->skip;
+FIN_LINEA: '\r'?'\n' ->skip;
+
+fragment DIGITO: [0-9];
+fragment LETRA: [a-zA-Z];
+
+VARIABLES: 'VARIABLES';
+SUBPROGRAMAS: 'SUBPROGRAMAS';
+INSTRUCCIONES: 'INSTRUCCIONES';
+NUM: 'NUM';
+LOG: 'LOG';
+SEQ: 'SEQ';
+FUNCION: 'FUNCION';
+PROCEDIMIENTO: 'PROCEDIMIENTO';
+RUPTURA: 'RUPTURA';
+MOSTRAR: 'MOSTRAR';
+DEV: 'dev';
+HACER: 'hacer';
+MIENTRAS: 'mientras';
+ENTONCES: 'entonces';
+FMIENTRAS: 'fmientras';
+FFUNCION: 'FFUNCION';
+SI: 'si';
+SINO: 'sino';
+FSI: 'fsi';
+DP: ':';
+PyC: ';';
+PA: '(';
+PC: ')';
+COMA: ',';
+ASIG: '=';
+CA: '[';
+CC: ']';
+LLA: '{';
+LLC: '}';
+MAS: '+';
+MENOS: '-';
+POR: '*';
+IGUAL: '==';
+DISTINTO: '!=';
+MAYOR: '>';
+MAYORIGUAL: '>=';
+MENOR: '<';
+MENORIGUAL: '<=';
+CIERTO: 'CIERTO';
+FALSO: 'FALSO';
+Y: '&&';
+O: '||';
+NO: '!';
+PARATODO: 'PARATODO';
+EXISTE: 'EXISTE';
+NUMERO: ('-')?DIGITO+;
+IDENT: LETRA(LETRA|DIGITO|'_')*;
