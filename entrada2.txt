@@ -1,0 +1,21 @@
+VARIABLES
+    i,max,min:NUM;
+    s:SEQ(NUM);
+SUBPROGRAMAS
+    FUNCION mayor_que_5(NUM x) dev (LOG r)
+    VARIABLES
+    INSTRUCCIONES
+        si(x>5) entonces
+            dev T;
+        sino
+            dev F;
+        fsi
+    FFUNCION
+INSTRUCCIONES
+    s = [3,4,2,7,9,0,11];
+    x = 1;
+    y = 2;
+    x,y = y,x+2;
+    x = 1;
+    y = 2;
+    y = y,x+2;

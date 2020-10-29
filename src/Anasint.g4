@@ -21,7 +21,7 @@ subprogramas: SUBPROGRAMAS (subprograma)*;
 
 subprograma: funcion | procedimiento;
 
-funcion: FUNCION IDENT PA param PC DEV PA param PC variables instrucciones dev FFUNCION;
+funcion: FUNCION IDENT PA param PC DEV PA param PC variables instrucciones FFUNCION;
 
 procedimiento: PROCEDIMIENTO IDENT PA PC
     | PROCEDIMIENTO IDENT PA (tipo variable)* PC variables instrucciones
@@ -33,14 +33,14 @@ param: tipo variable
 
 instrucciones: INSTRUCCIONES (instruccion)*;
 
-instruccion: asignacion | condicional | iteracion | ruptura | llamada_funcion | llamada_procedimiento | mostrar | aserto;
+instruccion: asignacion | condicional | iteracion | ruptura | llamada_funcion | llamada_procedimiento | mostrar | aserto | dev;
 
 asignacion: vars ASIG expr PyC
     | vars ASIG llamada_funcion PyC
     | vars ASIG llamada_procedimiento PyC
     ;
 
-condicional: SI PA condicion PC ENTONCES bloque bloque (alternativa)? FSI instruccion
+condicional: SI PA condicion PC ENTONCES (bloque)* (alternativa)? FSI instruccion?
     | PA condicion PC
     ;
 
@@ -68,15 +68,24 @@ aserto: LLA cuantificador LLC;
 
 ruptura: RUPTURA PyC;
 
-dev: DEV vars PyC;
+dev: DEV vars PyC
+    | DEV expr PyC
+    ;
 
 expr: expr_num | expr_bool | expr_sec | vars;
 
-expr_num: expr_num1 (MAS | MENOS | MULTI) expr_num
+
+expr_num: expr_num1 MULTI expr_num
     | expr_num1
     ;
 
-expr_num1: NUMERO | vars;
+expr_num1: expr_num2 (MAS | MENOS) expr_num1
+    | expr_num2
+    ;
+
+expr_num2: NUMERO
+    | vars
+    | PA expr_num PC;
 
 expr_bool: expr_bool1 Y expr_bool
     | expr_bool1 O expr_bool
