@@ -23,8 +23,8 @@ subprograma: funcion | procedimiento;
 
 funcion: FUNCION IDENT PA param PC DEV PA param PC variables instrucciones FFUNCION;
 
-procedimiento: PROCEDIMIENTO IDENT PA PC
-    | PROCEDIMIENTO IDENT PA (tipo variable)* PC variables instrucciones
+procedimiento: PROCEDIMIENTO IDENT PA PC FPROCEDIMIENTO
+    | PROCEDIMIENTO IDENT PA param PC variables instrucciones FPROCEDIMIENTO
     ;
 
 param: tipo variable

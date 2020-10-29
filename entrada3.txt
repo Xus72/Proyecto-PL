@@ -1,0 +1,26 @@
+VARIABLES
+i,max,min:NUM;
+s:SEQ(NUM);
+SUBPROGRAMAS
+    PROCEDIMIENTO mayor(SEQ(NUM) s, NUM i, NUM max)
+    VARIABLES
+        j: NUM;
+    INSTRUCCIONES
+        j=0;
+        max=s[j];
+        mientras(j<=ultima_posicion(s)) hacer
+            si(s[j]>max) entonces
+                max=s[j];
+                i=j;
+            fsi
+            j=j+1;
+        fmientras
+    FPROCEDIMIENTO
+INSTRUCCIONES
+    s = [3,4,2,7,9,0,11];
+    x = 1;
+    y = 2;
+    x,y = y,x+2;
+    x = 1;
+    y = 2;
+    y = y,x+2;
