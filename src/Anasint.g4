@@ -21,11 +21,14 @@ subprogramas: SUBPROGRAMAS (subprograma)*;
 
 subprograma: funcion | procedimiento;
 
-funcion: FUNCION IDENT PA PC DEV PA param variables instrucciones FFUNCION
-    | FUNCION IDENT PA param PC DEV PA param PC variables instrucciones FFUNCION;
+funcion: FUNCION IDENT cabecera cuerpo FFUNCION;
 
 procedimiento: PROCEDIMIENTO IDENT PA PC variables instrucciones FPROCEDIMIENTO
     | PROCEDIMIENTO IDENT PA param PC variables instrucciones FPROCEDIMIENTO;
+
+cabecera: PA (param)? PC (DEV)? PA param PC;
+
+cuerpo: variables instrucciones;
 
 param: tipo variable
     | tipo variable (COMA tipo variable)*
@@ -33,65 +36,70 @@ param: tipo variable
 
 instrucciones: INSTRUCCIONES (instruccion)*;
 
-instruccion: asignacion | condicional | iteracion | ruptura | llamada_funcion | llamada_procedimiento | mostrar | aserto | dev;
+instruccion: asignacion | condicional | iteracion | ruptura | llamada_funcion | llamada_procedimiento | mostrar | avance | aserto | dev;
 
 asignacion: vars ASIG expr PyC
     | vars ASIG llamada_funcion PyC
     ;
 
-condicional: SI PA condicion PC ENTONCES (bloque)* (alternativa)? FSI instruccion?
-    | PA condicion PC
-    ;
+condicional: SI PA condicion PC ENTONCES bloque (alternativa)? FSI;
 
 alternativa : SINO bloque;
 
-condicion: expr (MAYOR | MAYORIGUAL | MENOR | MENORIGUAL | IGUAL | DISTINTO) expr
-    | expr (MAYOR | MAYORIGUAL | MENOR | MENORIGUAL | IGUAL | DISTINTO) instruccion
+condicion: expr instrLogica expr;
+
+bloque: (instruccion)*
+    | (LLA avance LLC)? (instruccion)*
+    | condicional
     ;
 
-bloque: instruccion
-    | (LLA llamada_funcion LLC)? instruccion
-    ;
+instrLogica: MAYOR | MAYORIGUAL | MENOR | MENORIGUAL | IGUAL | DISTINTO;
 
 iteracion: MIENTRAS PA condicion PC HACER bloque FMIENTRAS;
 
-llamada_funcion: IDENT PA expr PC
-    | avance
-    ;
+llamada_funcion: IDENT PA expr PC;
 
 llamada_procedimiento: IDENT PA expr PC;
 
-mostrar: MOSTRAR PA variable PC;
+mostrar: MOSTRAR PA vars PC (PyC)?;
 
-avance: IDENT DP IDENT PA (vars) PC
+avance: IDENT DP IDENT PA (vars) PC;
 
-aserto: LLA cuantificador LLC;
-
+aserto: LLA cuantificador LLC
+    | LLA expr_bool LLC
+    ;
 ruptura: RUPTURA PyC;
 
-dev: DEV vars PyC;
+dev: DEV vars PyC
+    | DEV expr_bool PyC
+    ;
 
-expr: expr_num | expr_bool | expr_sec | vars;
+rango: CA vars CC
+    | CA expr COMA expr CC
+    ;
 
+formula: condicion Y condicion;
 
-expr_num: expr_num1 MULTI expr_num
+expr: expr_num | expr_bool | expr_sec | llamada_funcion;
+
+expr_num: expr_num1 (MAS | MENOS) expr_num
     | expr_num1
     ;
 
-expr_num1: expr_num2 (MAS | MENOS) expr_num1
+expr_num1: expr_num2 (POR) expr_num1
     | expr_num2
     ;
 
 expr_num2: NUMERO
-    | vars
+    | MENOS IDENT
+    | IDENT
     | PA expr_num PC;
 
-expr_bool: expr_bool1 Y expr_bool
-    | expr_bool1 O expr_bool
+expr_bool: expr_bool1 (Y|O) expr_bool
     | expr_bool1
     ;
 
-expr_bool1: NO expr_bool
+expr_bool1: NO expr_bool2
     | expr_bool2
     ;
 
@@ -101,7 +109,7 @@ expr_bool2: CIERTO
 
 expr_sec: sec_vacia
     | CA seq_elems CC
-    | IDENT CA IDENT CC
+    | vars CA expr CC // s[j]
     ;
 
 sec_vacia: CA CC;
@@ -109,8 +117,9 @@ sec_vacia: CA CC;
 seq_elems: expr_num (COMA seq_elems)?
     | expr_bool (COMA seq_elems)?
     | expr_sec (COMA seq_elems)?
+    | llamada_funcion (COMA seq_elems)?
     ;
 
-cuantificador: PARATODO variable DP expr
-    | EXISTE variable DP expr
+cuantificador: PARATODO PA vars DP rango COMA formula PC
+    | EXISTE PA vars DP rango formula PC
     ;

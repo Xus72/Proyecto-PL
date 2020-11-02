@@ -1,0 +1,27 @@
+VARIABLES
+    i,max,min:NUM;
+    s:SEQ(NUM);
+SUBPROGRAMAS
+    FUNCION mayor(SEQ s) dev (NUM i,NUM max)
+    VARIABLES
+        j: NUM;
+    INSTRUCCIONES
+        i=0;
+        mientras(i<=9) hacer
+            x=3;
+            ruptura;
+            i=i+1;
+    fmientras
+    dev max,i;
+    FFUNCION
+INSTRUCCIONES
+    s = [3,4,2,7,9,0,11];
+    x = 1;
+    y = 2;
+    x,y = y,x+2;
+    x = 1;
+    y = 2;
+    y = y,x+2;
+    x,y = mayor(s);
+    x,y = mayor(1);
+    mostrar(s)
