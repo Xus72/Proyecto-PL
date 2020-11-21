@@ -5,7 +5,7 @@ options{
     tokenVocab=Analex;
 }
 
-programa: variables subprogramas instrucciones EOF;
+programa: PROGRAMA variables subprogramas instrucciones EOF;
 
 variables: VARIABLES (decl_vars)*;
 
@@ -13,7 +13,7 @@ decl_vars: vars DP tipo PyC;
 
 vars: IDENT (COMA vars)?;
 
-tipo: NUM | LOG | SEQ PA tipo PC | SEQ;
+tipo: NUM | LOG | SEQ PA tipo PC;
 
 subprogramas: SUBPROGRAMAS (subprograma)*;
 
@@ -103,7 +103,8 @@ expr_bool2: CIERTO
     | FALSO
     | vars
     | PA expr_bool PC
-    | PA (vars|instrLogica|expr_bool)* PC
+    | PA vars PC
+    | PA instrLogica PC
     ;
 
 expr_sec: CA CC
@@ -118,5 +119,5 @@ seq_elems: expr_num (COMA seq_elems)?
     ;
 
 cuantificador: PARATODO PA vars DP rango COMA formula PC
-    | EXISTE PA vars DP rango formula PC
+    | EXISTE PA vars DP rango COMA formula PC
     ;
