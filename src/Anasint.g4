@@ -36,6 +36,7 @@ instruccion: asignacion | condicional | iteracion | ruptura | llamada_funcion | 
 
 asignacion: vars ASIG expr (COMA expr)? PyC
     | vars ASIG llamada_funcion PyC
+    | vars ASIG llamada_procedimiento PyC
     ;
 
 condicional: SI PA condicion PC ENTONCES bloque (alternativa)? FSI;
@@ -73,12 +74,12 @@ rango: CA vars CC
     | CA expr COMA expr CC
     ;
 
-formula: condicion expr_bool condicion;
-
-expr: expr_num | expr_bool | expr_sec | llamada_funcion;
+formula: condicion instrLogica condicion
+    | condicion expr_bool condicion
+    ;
+expr: expr_num | expr_bool | expr_sec | llamada_funcion | llamada_procedimiento;
 
 expr_num: expr_num1 (MAS | MENOS) expr_num
-    | expr_num1 (MAS | MENOS) expr
     | expr_num1
     ;
 
@@ -91,20 +92,17 @@ expr_num2: NUMERO
     | IDENT
     | PA expr_num PC;
 
-expr_bool: (Y|O) expr_bool
+expr_bool: (Y|O)
     | expr_bool1
     ;
 
-expr_bool1: NO expr_bool2
+expr_bool1: NO
     | expr_bool2
     ;
 
 expr_bool2: CIERTO
     | FALSO
-    | vars
-    | PA expr_bool PC
-    | PA vars PC
-    | PA instrLogica PC
+    | IDENT
     ;
 
 expr_sec: CA CC
@@ -116,6 +114,7 @@ seq_elems: expr_num (COMA seq_elems)?
     | expr_bool (COMA seq_elems)?
     | expr_sec (COMA seq_elems)?
     | llamada_funcion (COMA seq_elems)?
+    | llamada_procedimiento (COMA seq_elems)?
     ;
 
 cuantificador: PARATODO PA vars DP rango COMA formula PC
