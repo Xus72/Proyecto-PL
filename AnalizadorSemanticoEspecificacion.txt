@@ -1,0 +1,234 @@
+DECISIONES:
+
+DECISIÓN DISEÑO 1: Almacenar la variable y su tipo en una memoria.
+
+(memoria variables)
+
+    variable    |   tipo
+-------------------------------
+        i       |   NUM
+        min     |   NUM
+        max     |   NUM
+        s       |   SEQ(NUM)
+        r       |   LOG
+        t       |   SEQ(LOG)
+
+GRAMÁTICA ATRIBUIDA
+programa: PROGRAMA variables subprogramas instrucciones EOF;
+
+VARIABLES d=(decl_vars)* {almacenar (v,t) en memoria};;
+
+(parametro de salida v y t}
+decl_vars = v=vars DP t=tipo PyC;
+
+(parametro de salida t)
+tipo: t=NUM
+    | t=LOG
+    | t=SEQ PA NUM PC
+    | t=SEQ PA LOG PC
+    ;
+
+(parametro de salida v)
+vars: v=IDENT
+    | v=IDENT COMA vars
+    ;
+
+DECISIÓN DISEÑO error 1.1: Crear memoria para las variables declaradas en las funciones y procedimientos.
+
+(memoria subproblemas)
+
+    variable    |   tipo
+-------------------------------
+        i       |   NUM
+        min     |   NUM
+        max     |   NUM
+        s       |   SEQ(NUM)
+        r       |   LOG
+        t       |   SEQ(LOG)
+
+GRAMÁTICA ATRIBUIDA
+subprogramas: SUBPROGRAMAS (subprogramas)*;
+
+subprograma: funcion | procedimiento
+
+funcion: FUNCION IDENT c=cabecera d=cuerpo FFUNCION {almacenar c y d en memoria};
+
+procedimiento: PROCEDIMIENTO IDENT c=cabecera d=cuerpo FFPROCEDIMIENTO {almacenar c y d en memoria};
+
+parametro de salida p)
+cabecera: PA (p=param)? PC (DEV)? PA param PC
+    | PA (p=param)? PC
+    ;
+
+(parametro de salida w y t)
+param: t=tipo w=IDENT (COMA t=tipo w=IDENT)*;
+
+
+(parametro de salida v)
+cuerpo: v=variables instrucciones;
+
+DECISIÓN DISEÑO error 2: Verificar que las variables que aparecen en las asignaciones están declaradas en instrucciones,
+es decir, que aparecen en la memoria principal del programa. En caso de que no estén declarada una variable devolver error.
+
+GRAMÁTICA ATRIBUIDA
+asignacion: v=vars expr (COMA expr)? PyC {comprobar que v ha sido declarada};
+
+expr: expr_num #ExprNum
+     | expr_bool #ExprBool
+     | expr_sec #ExprSec
+     | llamada_funcion #ExprFuncion
+     | llamada_procedimiento #ExprProcedimiento
+     ;
+
+ expr_num: expr_num1 (MAS | MENOS) expr_num
+     | expr_num1
+     ;
+
+ expr_num1: expr_num2 POR expr_num1
+     | expr_num2
+     ;
+
+expr_num2: NUMERO
+    | MENOS v=IDENT {comprobar que v ha sido declarada}
+    | v=IDENT {comprobar que v ha sido declarada}
+    | PA expr_num PC
+
+DECISION 2.2: Verificar que las variables que aparecen en las asignaciones de un subprograma están declaradas, es decir,
+que aparecen en la memoria principal del programa y además, en la memoria del subprograma que estamos visitando. En caso
+de no estár declarada una variable devolvemos un error.
+
+cuerpo: variables instrucciones;
+
+asignacion: v=vars expr (COMA expr)? PyC {comprobar que v ha sido declarada};
+
+expr: expr_num #ExprNum
+     | expr_bool #ExprBool
+     | expr_sec #ExprSec
+     | llamada_funcion #ExprFuncion
+     | llamada_procedimiento #ExprProcedimiento
+     ;
+
+ expr_num: expr_num1 (MAS | MENOS) expr_num
+     | expr_num1
+     ;
+
+ expr_num1: expr_num2 POR expr_num1
+     | expr_num2
+     ;
+
+expr_num2: NUMERO
+    | MENOS v=IDENT {comprobar que v ha sido declarada}
+    | v=IDENT {comprobar que v ha sido declarada}
+    | PA expr_num PC
+
+
+DECISIÓN DISEÑO 3: Para las condiciones usadas en las instrucciones de condicionales
+y de iteraciones necesitamos que la condición sea verdadero, falso o indefinido.
+
+DECISIÓN DISEÑO error 1:
+Salta un error cuando en la condición no hay un resultado LOG
+
+DECISIÓN DISEÑO error 2:
+Salta un error
+-si al comparar los tipos a ambos lados de expr_bool y instLógica no son iguales
+-si en condición lógica no estamos tratando con números, es decir, NUM.
+-si en condición booleana no estamos tratango con booleanos, es decir, LOG.
+En los tres casos, nos devolverá Tipo Indefinido, así nos aseguramos de que el resultado de la condición sea VERDADERA, FALSA o INDEFINIDA(error).
+
+GRAMÁTICA ATRIBUIDA:
+En nuestro analizador sintáctico nos encotramos con varias posibles instrucciones:
+
+    instruccion: asignacion | condicional| iteracion | ruptura | llamada_funcion
+    | llamada_procedimiento | mostrar | avance | aserto | dev;
+
+De las cuales la condicionales y las iteraciones tienen que incluir una condición donde le indique a la máquina
+si realizar las instrucciones siguientes o no
+
+    condicional: SI PA condicion PC ENTONCES bloque (alternativa)? FSI;
+
+    iteracion: MIENTRAS PA condicion PC HACER bloque FMIENTRAS;
+
+Está condición para poder ejecurase debe devolver un valor booleano, es decir, ser falso o cierto,
+en caso de ser indefinido será porque por ejemplo nos encontramos con una variables sin valor.
+
+    condicion: cond;
+
+    cond: expr   #CondExpr  {de expr miro su tipo}
+        |cond expr_bool cond #CondBool   {de cond miro los tipos y miro si son iguales y deben ser de tipo lógico}
+        |cond instrLogica cond  #CondLog  {de cond miro los tipos y miro si son iguales y deben ser de tipo numérico}
+        ;
+
+    Aclaración en asertos: En los asertos al llamar a la condición, también nos aseguramos de que sean booleanos.
+    aserto: LLA cuantificador LLC
+        | LLA expr_bool LLC
+        ;
+    cuantificador: PARATODO PA vars DP rango COMA formula PC
+        | EXISTE PA vars DP rango COMA formula PC
+        ;
+    rango: CA vars CC
+        | CA expr COMA expr CC
+        ;
+    formula: condicion instrLogica condicion
+        | condicion expr_bool condicion
+        ;
+
+Decisión diseño 4: Verificar la existencia de rupturas inalcanzables, dentro de las instrucciones.
+Utilizaremos un centinela y un contador que serán los encargados de controlar en cada paso que demos si hemos alcanzado una ruptura y si esta es inalcanzable.
+
+DECISION 4.1: Dentro de instruccion, las rupturas afectan al codicional y a la iteracion.
+Esto se debe a que ambos necesitan de un bloque y dicho bloque está formado por instrucciones.
+
+DECISIÓN DISEÑO error 1: Dentro del bloque si hay una ruptura, el siguiente que haya en el mismo nivel
+es inalcanzable
+    ...
+    mientras(i<=ultima_posicion(s) ) hacer
+            ruptura;
+            ruptura; //inalcanzable
+    fmientras
+    ...
+
+//decision 1.1:
+        Usaremos una variable de tipo boolean que pase a true cuando detecte una ruptura en el bloque,
+        y usaremos un contador para saber cuales son inalcanzables.
+
+GRAMÁTICA ATRIBUIDA:
+
+programa: PROGRAMA variables subprogramas instrucciones EOF;
+
+instrucciones: INSTRUCCIONES (instruccion)*;
+
+instruccion[cent] dev b: asignacion | b=condicional[cent]| b=iteracion[cent] | b=ruptura[cent]
+| llamada_funcion | llamada_procedimiento | mostrar | avance | aserto | dev;
+
+condicional dev b: SI PA condicion PC ENTONCES bloque[cent] (SINO b=bloque[cent])? FSI;
+
+bloque: (instruccion)[cent]*
+    | (LLA avance LLC)[cent] (instruccion)[cent]*;
+
+iteracion[cent]: MIENTRAS PA condicion PC HACER b=bloque[cent] FMIENTRAS;
+
+ruptura[cent] dev b: b=RUPTURA PYC;
+
+DECISIÓN DISEÑO 5: La devolución de la función debe coincidir con el tipo de la variable.
+
+DECISIÓN DISEÑOR error 5.1: Será necesario comprobar que, exclusivamente en FUNCIÓN, el tipo que devuelve (DEV) corresponde al
+tipo devuelto en el cuerpo de la función.
+
+GRAMÁTICA ATRIBUIDA
+subprogramas: SUBPROGRAMAS (subprogramas)*
+
+subprograma: funcion
+
+funcion: FUNCION IDENT c=cabecera d=cuerpo FFUNCION {almacenar c y d en memoria}
+
+(parametro de salida p)
+cabecera: PA (p=DEV)? PC (DEV)? PA param PC {almacenar p en memoria_cabecera}
+    | PA (p=DEV)? PC
+    ;
+
+(parametro de salida w y t)
+param: t=tipo w=IDENT (COMA t=tipo w=IDENT)*;
+
+
+(parametro de salida v)
+cuerpo: v=variables instrucciones;

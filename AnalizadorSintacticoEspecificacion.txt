@@ -1,0 +1,174 @@
+//Analizador sintáctico
+
+Definimos los bloques que componen el programa.
+programa: PROGRAMA variables subprogramas instrucciones EOF;
+
+Definimos el bloque variable que puede estar compuesto por más de una declaracion de variables.
+variables: VARIABLES (decl_vars)*;
+
+Dentro del bloque variables esta compuesta por la siguiente estructura.
+decl_vars: vars DP tipo PyC;
+
+Puede definir más de una variable dentro del bloque y si se da el caso cada variable esta separada de otra por comas(",").
+vars: IDENT (COMA vars)?;
+
+Cada una de las variables pueden corresponder a estos tipos(Numéricas, lógicas o secuencia de NUM o LOG).
+tipo: NUM | LOG | SEQ PA tipo PC;
+
+Definimos el bloque subprograma con su palabra reservada y que puede estar compuesta por más de un subprograma.
+subprogramas: SUBPROGRAMAS (subprograma)*;
+
+Dentro del lenguaje en subprogramas se diferencian 2 tipos de bloques, funciones o procedimientos.
+subprograma: funcion | procedimiento;
+
+Las funciones vienen dadas por la palabra reservada "FUNCION", un identificador, una cabecera, 
+un cuerpo y la palabra "FFUNCION" que cierra la función.
+funcion: FUNCION IDENT cabecera cuerpo FFUNCION;
+
+Los procedimientos vienen dados por la palabra reservada "PROCEDIMIENTO", un identificador, una cabecera, un cuerpo y
+la palabra "FPROCEDIMIENTO" que cierra el procedimiento.
+procedimiento: PROCEDIMIENTO IDENT cabecera cuerpo FPROCEDIMIENTO;
+
+La cabecera puede ser un conjunto vacío de parámetros y un conjunto de parámetros de salida.
+cabecera: PA (param)? PC (DEV)? PA param PC 
+    | PA (param)? PC
+    ;
+
+Llamada recursiva dentro del bloque subprograma hacia los bloques exteriores de variables e instrucciones.
+cuerpo: variables instrucciones;
+
+Parámetros definidos con su tipo y separados por comas.
+param: tipo IDENT (COMA tipo IDENT)*;
+
+Definimos el bloque subprograma con su palabra reservada y que puede estar compuesta por más de una instruccion.
+instrucciones: INSTRUCCIONES (instruccion)*; 
+
+Los diferentes tipos de instrucciones posibles en el lenguaje.
+instruccion: asignacion | condicional| iteracion | ruptura | llamada_funcion | llamada_procedimiento | mostrar | avance | aserto | dev;
+
+Asignaciones de variables, llamadas a funciones y a procedimientos.
+asignacion: vars ASIG expr (COMA expr)? PyC #AsigExpr
+    ;
+
+Estructura de las instrucciones condicionales que viene marcada por la palabra "SI".
+condicional: SI PA condicion* PC ENTONCES bloque (alternativa)? FSI;
+
+Segunda parte del condicional que viene indicada por la palabra "SINO".
+alternativa : SINO bloque; 
+
+La condición de iteraciones o/y condicionales.
+condicion:  cond;
+
+Diferentes tipos de posibilidades dentro de una condición, que pueden ser una una expresión, condiciones unidas por 
+expresiones booleanas (Y|O|NO|CIERTO|FALSO) o con instrucciones lógicas (MAYOR | MAYORIGUAL | MENOR | MENORIGUAL | IGUAL | DISTINTO).
+cond: expr   #CondExpr
+    |cond expr_bool cond #CondBool
+    |cond instrLogica cond  #CondLog
+
+Los bloques pueden estar compuestos por más de una instrucción y tener una función de avance asociada.
+bloque: (instruccion)*  
+    | (LLA avance LLC) (instruccion)*
+    ;
+
+Diferentes instrucciones lógicas en el lenguaje.
+instrLogica: MAYOR | MAYORIGUAL | MENOR | MENORIGUAL | IGUAL | DISTINTO;
+
+Instrucción que se repite mientras se cumpla la condición.
+iteracion: MIENTRAS PA condicion PC HACER bloque FMIENTRAS; 
+
+Instrucción que llama a una función.
+llamada_funcion: IDENT PA expr PC;
+
+Instrucción que llama a un procedimiento.
+llamada_procedimiento: IDENT PA expr PC;
+
+Instrucción que muestra por pantalla los valores de diferentes variables.
+mostrar: MOSTRAR PA vars PC PyC;
+
+Instrucción de avance.
+avance: IDENT DP IDENT PA (vars) PC;
+
+2 formas posibles de asertos del lenguanje.
+aserto: LLA cuantificador LLC 
+    | LLA expr_bool LLC
+    ;
+
+Instrucción de ruptura.
+ruptura: RUPTURA PyC;
+
+Instruccion que devuelve variables o expresiones lógicas
+dev: DEV vars PyC   
+    | DEV expr_bool PyC
+    ;
+
+Diferentes variables definidas en los asertos.
+rango: CA vars CC   
+    | CA expr COMA expr CC
+    ;
+
+Método para concatenar diferentes condiciones
+formula: condicion instrLogica condicion
+    | condicion expr_bool condicion
+    ;
+
+Expresiones del lenguaje, llamadas a funciones y procedimientos.
+expr: expr_num #ExprNum     
+    | expr_bool #ExprBool
+    | expr_sec #ExprSec
+    | llamada_funcion #ExprFuncion
+    | llamada_procedimiento #ExprProcedimiento
+    ;
+
+Expresiones numéricas con los signos más y menos.
+expr_num: expr_num1 (MAS | MENOS) expr_num 
+    | expr_num1
+    ;
+
+Expresiones numéricas priorizando la multiplicación sobre la suma o la resta.
+expr_num1: expr_num2 POR expr_num1
+    | expr_num2
+    ;
+
+Expresiones numéricas priorizando los paréntesis sobre el resto de 
+expresiones numéricas.
+expr_num2: NUMERO #ExprNumero       
+    | MENOS IDENT   #ExprMenosIdent
+    | IDENT #ExprIdent
+    | PA expr_num PC #ExprExpr
+    ;
+
+Expresiones lógicas && y ||.
+expr_bool: (Y|O)    
+    | expr_bool1
+    ;
+
+Expresiones lógicas priorizando la ! sobre && y ||
+expr_bool1: NO      
+    | expr_bool2
+    ;
+
+Expresiones lógicas prioriza lo que esté entre paréntesis.
+expr_bool2: CIERTO  
+    | FALSO
+    | IDENT
+    | PA condicion* PC
+    ;
+
+Diferentes opciones para definir secuencias.
+expr_sec: CA CC         
+    | CA seq_elems CC
+    | vars CA expr CC // s[j]
+    ;
+
+Definiciones múltiples de secuencias de elementos.
+seq_elems: expr_num (COMA seq_elems)?   
+    | expr_bool (COMA seq_elems)?
+    | expr_sec (COMA seq_elems)?
+    | llamada_funcion (COMA seq_elems)?
+    | llamada_procedimiento (COMA seq_elems)?
+    ;
+
+Las 2 estructuras con sus respectivos cuantificadores.
+cuantificador: PARATODO PA vars DP rango COMA formula PC 
+    | EXISTE PA vars DP rango COMA formula PC
+    ;

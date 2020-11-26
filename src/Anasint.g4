@@ -1,3 +1,4 @@
+
 //Analizador sintáctico
 parser grammar Anasint;
 
@@ -32,18 +33,21 @@ param: tipo IDENT (COMA tipo IDENT)*;
 
 instrucciones: INSTRUCCIONES (instruccion)*;
 
-instruccion: asignacion | condicional | iteracion | ruptura | llamada_funcion | llamada_procedimiento | mostrar | avance | aserto | dev;
+instruccion: asignacion | condicional| iteracion | ruptura | llamada_funcion | llamada_procedimiento | mostrar | avance | aserto | dev;
 
 asignacion: vars ASIG expr (COMA expr)? PyC
-    | vars ASIG llamada_funcion PyC
-    | vars ASIG llamada_procedimiento PyC
     ;
 
 condicional: SI PA condicion PC ENTONCES bloque (alternativa)? FSI;
 
 alternativa : SINO bloque;
 
-condicion: expr (instrLogica|expr_bool) expr;
+condicion: cond;
+
+cond: expr   #CondExpr
+    |cond expr_bool cond #CondBool
+    |cond instrLogica cond  #CondLog
+    ;
 
 bloque: (instruccion)*
     | (LLA avance LLC) (instruccion)*
@@ -77,7 +81,12 @@ rango: CA vars CC
 formula: condicion instrLogica condicion
     | condicion expr_bool condicion
     ;
-expr: expr_num | expr_bool | expr_sec | llamada_funcion | llamada_procedimiento;
+expr: expr_num #ExprNum
+    | expr_bool #ExprBool
+    | expr_sec #ExprSec
+    | llamada_funcion #ExprFuncion
+    | llamada_procedimiento #ExprProcedimiento
+    ;
 
 expr_num: expr_num1 (MAS | MENOS) expr_num
     | expr_num1
@@ -87,11 +96,11 @@ expr_num1: expr_num2 POR expr_num1
     | expr_num2
     ;
 
-expr_num2: NUMERO
-    | MENOS IDENT
-    | IDENT
-    | PA expr_num PC;
-
+expr_num2: NUMERO #ExprNumero
+    | MENOS IDENT   #ExprMenosIdent
+    | IDENT #ExprIdent
+    | PA expr_num PC #ExprExpr
+    ;
 expr_bool: (Y|O)
     | expr_bool1
     ;
@@ -103,6 +112,7 @@ expr_bool1: NO
 expr_bool2: CIERTO
     | FALSO
     | IDENT
+    | PA condicion* PC
     ;
 
 expr_sec: CA CC

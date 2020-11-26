@@ -1,0 +1,50 @@
+PROGRAMA
+VARIABLES
+    i,max,min:NUM;
+    s:SEQ(NUM);
+    p:LOG;
+SUBPROGRAMAS
+    FUNCION mayor(SEQ(NUM) s) dev (LOG r)
+    VARIABLES
+        j: NUM;
+    INSTRUCCIONES
+        j=0;
+        max=s[j];
+        mientras(j<=ultima_posicion(s))hacer
+            si(s[j]>max) entonces
+            max=s[j];
+            i=j;
+        fsi
+        j=j+1;
+        fmientras
+        dev max, i;
+    FFUNCION
+INSTRUCCIONES
+    x = y+t;
+    y = 2;
+    x,y = y,x+2;
+    x = 1;
+    y = 2;
+    y = y,x+2;
+    t = mayor(f);
+    s = [3,2,5,3,5,0];
+     mientras(i<=ultima_posicion(s) ) hacer
+            ruptura;
+            ruptura;
+            ruptura;
+            si(s[i]>max) entonces
+                ruptura;
+                ruptura;
+                ruptura;
+
+                max=s[i];
+            fsi
+            ruptura;
+            si(s[i]<min) entonces
+                ruptura;
+                min=s[i];
+            fsi
+            mostrar(min,max);
+            { PARATODO(p:[0,ultima_posicion(s)],s[p]<=max && s[p]>=min) }
+            i=i+1;
+        fmientras
